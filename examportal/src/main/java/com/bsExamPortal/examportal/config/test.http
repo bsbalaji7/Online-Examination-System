@@ -1,0 +1,10 @@
+# @no-cookie-jar
+POST http://localhost:8080/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "BS",
+  "email": "bs@gmail.com",
+  "password": "1234",
+  "role": "STUDENT"
+}
