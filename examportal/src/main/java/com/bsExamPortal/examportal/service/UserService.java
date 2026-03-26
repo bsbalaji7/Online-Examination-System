@@ -8,24 +8,27 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-
 @Service
 @RequiredArgsConstructor
 public class UserService {
+
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public User registerUser(String name, String email, String password, String rolename){
-        // it will check the email if it is already exists
+    // REGISTER METHOD
+    public User registerUser(String name, String email, String password, String rolename) {
+
+        // Check if email exists
         if (userRepository.findByEmail(email).isPresent()) {
             throw new RuntimeException("Email is Already Registered !!!");
         }
-        // Find role from database
+
+        // Find role
         Role role = roleRepository.findByRoleName(rolename)
                 .orElseThrow(() -> new RuntimeException("Role is not Found"));
 
-        // Creates the new user
+        // Create user
         User user = new User();
         user.setName(name);
         user.setEmail(email);
@@ -33,5 +36,20 @@ public class UserService {
         user.setRole(role);
 
         return userRepository.save(user);
+    }
+
+    // LOGIN METHOD (SEPARATE METHOD)
+    public User loginUser(String email, String password) {
+
+        // Find user
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Check password
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new RuntimeException("Invalid Password");
+        }
+
+        return user;
     }
 }
