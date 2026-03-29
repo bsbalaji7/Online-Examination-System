@@ -38,7 +38,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    // LOGIN METHOD (SEPARATE METHOD)
+    // LOGIN METHOD (SEPARATED METHOD)
     public User loginUser(String email, String password) {
 
         // Find user
