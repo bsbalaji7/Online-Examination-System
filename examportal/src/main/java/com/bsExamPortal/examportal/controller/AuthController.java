@@ -11,12 +11,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bsExamPortal.examportal.dto.LoginRequest;
+import com.bsExamPortal.examportal.security.JwtUtil;
+
 
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
-
+    private final JwtUtil jwtUtil;
     private final UserService userService;
     @PostMapping("/register")
     public ResponseEntity<User> register(@RequestBody RegisterRequest request) {
@@ -27,5 +30,17 @@ public class AuthController {
                 request.getRole()
         );
         return ResponseEntity.ok(user);
+    }
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+
+        User user = userService.loginUser(
+                request.getEmail(),
+                request.getPassword()
+        );
+
+        String token = jwtUtil.generateToken(user.getEmail());
+
+        return ResponseEntity.ok(token);
     }
 }
