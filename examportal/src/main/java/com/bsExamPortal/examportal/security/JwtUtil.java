@@ -32,4 +32,7 @@ public class JwtUtil {
                 .getBody()
                 .getSubject();
     }
+
+    public boolean validateToken(String token, String email) {
+        return extractUsername(token).equals(email);    }
 }
