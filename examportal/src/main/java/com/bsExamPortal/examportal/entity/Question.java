@@ -1,5 +1,5 @@
 package com.bsExamPortal.examportal.entity;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -24,7 +24,10 @@ public class Question {
 
     private String correctAnswer;
 
+
+
     @ManyToOne
     @JoinColumn(name = "exam_id")
+    @JsonIgnore
     private Exam exam;
 }
