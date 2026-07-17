@@ -17,7 +17,7 @@ function App() {
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/student" element={<StudentDashboard />} />
         <Route path="/exams" element={<ExamList />} />
-        <Route path="/take-exam" element={<TakeExam />} />
+        <Route path="/take-exam/:examId" element={<TakeExam />} />
         <Route path="/result" element={<Result />} />
       </Routes>
     </BrowserRouter>
