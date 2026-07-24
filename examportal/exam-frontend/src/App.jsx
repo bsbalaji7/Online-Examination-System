@@ -7,6 +7,8 @@ import StudentDashboard from "./pages/StudentDashboard";
 import ExamList from "./pages/ExamList";
 import TakeExam from "./pages/TakeExam";
 import Result from "./pages/Result";
+import CreateExam from "./pages/CreateExam";
+import ManageExams from "./pages/ManageExams";
 
 function App() {
   return (
@@ -19,6 +21,14 @@ function App() {
         <Route path="/exams" element={<ExamList />} />
         <Route path="/take-exam/:examId" element={<TakeExam />} />
         <Route path="/result" element={<Result />} />
+        <Route
+    path="/admin/create-exam"
+    element={<CreateExam />}
+/>
+<Route
+    path="/admin/exams"
+    element={<ManageExams />}
+/>
       </Routes>
     </BrowserRouter>
   );
