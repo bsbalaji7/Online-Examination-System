@@ -69,7 +69,7 @@ function ManageQuestions() {
     const loadQuestions = async (examId) => {
         try {
             const response = await api.get(
-                `/questions/exam/${examId}`,
+                `/questions/admin/exam/${examId}`,
                 {
                     headers: getHeaders()
                 }
