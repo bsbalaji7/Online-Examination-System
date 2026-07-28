@@ -20,11 +20,18 @@ function Login() {
                 password
             });
 
-            localStorage.setItem("token", response.data);
+            localStorage.setItem("token", response.data.token);
+            localStorage.setItem("studentId", response.data.userId);
+            localStorage.setItem("role", response.data.role);
+            localStorage.setItem("name", response.data.name);
 
             alert("Login Successful");
 
-            navigate("/student");
+            if (response.data.role === "ADMIN") {
+                navigate("/admin");
+            } else {
+                navigate("/student");
+            }
 
         } catch (error) {
 
