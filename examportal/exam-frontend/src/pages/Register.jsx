@@ -1,62 +1,182 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import api from "../services/api";
 
 function Register() {
-  return (
-    <div className="container mt-5">
-      <div className="row justify-content-center">
-        <div className="col-md-5">
+    const navigate = useNavigate();
 
-          <div className="card shadow p-4">
+    const [formData, setFormData] = useState({
+        name: "",
+        email: "",
+        password: "",
+        role: "STUDENT"
+    });
 
-            <h2 className="text-center mb-4">
-              Register
-            </h2>
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
 
-            <form>
+    const handleChange = (e) => {
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value
+        });
+    };
 
-              <div className="mb-3">
-                <label>Name</label>
-                <input
-                  className="form-control"
-                  placeholder="Enter Name"
-                />
-              </div>
+    const handleSubmit = async (e) => {
+        e.preventDefault();
 
-              <div className="mb-3">
-                <label>Email</label>
-                <input
-                  type="email"
-                  className="form-control"
-                  placeholder="Enter Email"
-                />
-              </div>
+        setLoading(true);
+        setError("");
 
-              <div className="mb-3">
-                <label>Password</label>
-                <input
-                  type="password"
-                  className="form-control"
-                  placeholder="Enter Password"
-                />
-              </div>
+        try {
+            await api.post("/auth/register", formData);
 
-              <button className="btn btn-success w-100">
-                Register
-              </button>
+            alert("Registration successful!");
+            navigate("/");
 
-            </form>
+        } catch (error) {
+            console.error(error);
 
-            <p className="text-center mt-3">
-              Already have an account?
-              <Link to="/"> Login</Link>
-            </p>
+            setError(
+                error.response?.data?.message ||
+                "Registration failed. Please try again."
+            );
+        } finally {
+            setLoading(false);
+        }
+    };
 
-          </div>
+    return (
+        <div className="auth-page">
+
+            <div className="auth-card">
+
+                <div className="auth-logo">
+                    EP
+                </div>
+
+                <div className="text-center mb-4">
+                    <h2 className="fw-bold">
+                        Create Account
+                    </h2>
+
+                    <p className="text-secondary">
+                        Join ExamPortal and start your examinations.
+                    </p>
+                </div>
+
+                {error && (
+                    <div className="alert alert-danger">
+                        {error}
+                    </div>
+                )}
+
+                <form onSubmit={handleSubmit}>
+
+                    <div className="mb-3">
+
+                        <label className="form-label">
+                            Full Name
+                        </label>
+
+                        <input
+                            type="text"
+                            name="name"
+                            className="form-control"
+                            placeholder="Enter your full name"
+                            value={formData.name}
+                            onChange={handleChange}
+                            required
+                        />
+
+                    </div>
+
+                    <div className="mb-3">
+
+                        <label className="form-label">
+                            Email Address
+                        </label>
+
+                        <input
+                            type="email"
+                            name="email"
+                            className="form-control"
+                            placeholder="you@example.com"
+                            value={formData.email}
+                            onChange={handleChange}
+                            required
+                        />
+
+                    </div>
+
+                    <div className="mb-3">
+
+                        <label className="form-label">
+                            Password
+                        </label>
+
+                        <input
+                            type="password"
+                            name="password"
+                            className="form-control"
+                            placeholder="Create a secure password"
+                            value={formData.password}
+                            onChange={handleChange}
+                            required
+                        />
+
+                    </div>
+
+                    <div className="mb-4">
+
+                        <label className="form-label">
+                            Account Type
+                        </label>
+
+                        <select
+                            name="role"
+                            className="form-select"
+                            value={formData.role}
+                            onChange={handleChange}
+                        >
+                            <option value="STUDENT">
+                                Student
+                            </option>
+                        </select>
+
+                    </div>
+
+                    <button
+                        type="submit"
+                        className="btn-primary-custom w-100"
+                        disabled={loading}
+                    >
+                        {loading
+                            ? "Creating account..."
+                            : "Create Account"}
+                    </button>
+
+                </form>
+
+                <div className="text-center mt-4">
+
+                    <span className="text-secondary">
+                        Already have an account?{" "}
+                    </span>
+
+                    <Link
+                        to="/"
+                        className="text-decoration-none fw-semibold"
+                    >
+                        Sign in
+                    </Link>
+
+                </div>
+
+            </div>
 
         </div>
-      </div>
-    </div>
-  );
+    );
 }
 
 export default Register;
