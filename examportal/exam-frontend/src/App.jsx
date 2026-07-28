@@ -9,6 +9,8 @@ import TakeExam from "./pages/TakeExam";
 import Result from "./pages/Result";
 import CreateExam from "./pages/CreateExam";
 import ManageExams from "./pages/ManageExams";
+import EditExam from "./pages/EditExam";
+import ManageQuestions from "./pages/ManageQuestions";
 
 function App() {
   return (
@@ -28,6 +30,14 @@ function App() {
 <Route
     path="/admin/exams"
     element={<ManageExams />}
+/>
+<Route
+    path="/admin/edit-exam/:id"
+    element={<EditExam />}
+/>
+<Route
+    path="/admin/questions"
+    element={<ManageQuestions />}
 />
       </Routes>
     </BrowserRouter>
