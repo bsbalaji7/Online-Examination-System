@@ -17,29 +17,138 @@ function Login() {
         setError("");
 
         try {
-            const response = await api.post("/auth/login", {
+            // 1. Login and receive JWT token
+            const loginResponse = await api.post("/auth/login", {
                 email,
                 password
             });
 
-            /*
-             * Keep the storage logic that is already working in your
-             * project. If your login API only returns the JWT token,
-             * don't replace your existing role/name/studentId logic.
-             */
-            localStorage.setItem("token", response.data);
+            const token = loginResponse.data;
 
-            const role = localStorage.getItem("role");
+            if (!token) {
+                throw new Error("Token was not received from server");
+            }
 
-            if (role === "ADMIN") {
+            // 2. Temporarily save token
+            localStorage.setItem("token", token);
+
+            // 3. Get users to identify the logged-in user
+            const usersResponse = await api.get("/auth/users", {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            // 4. Find user using login email
+            const user = usersResponse.data.find(
+                (u) =>
+                    u.email &&
+                    u.email.toLowerCase() === email.toLowerCase()
+            );
+
+            if (!user) {
+                throw new Error("Logged-in user information not found");
+            }
+
+            console.log("Logged in user:", user);
+            console.log("Role from backend:", user.role);
+
+            // 5. Extract role
+            // Supports:
+            // "STUDENT"
+            // "ROLE_STUDENT"
+            // { name: "STUDENT" }
+            // { roleName: "STUDENT" }
+            // { role: "STUDENT" }
+            // { authority: "ROLE_STUDENT" }
+
+            let roleValue = "";
+
+            if (typeof user.role === "string") {
+                roleValue = user.role;
+            } else if (
+                user.role &&
+                typeof user.role === "object"
+            ) {
+                roleValue =
+                    user.role.name ||
+                    user.role.roleName ||
+                    user.role.role ||
+                    user.role.authority ||
+                    "";
+            }
+
+            const normalizedRole = String(roleValue)
+                .toUpperCase()
+                .replace("ROLE_", "")
+                .trim();
+
+            console.log("Role value:", roleValue);
+            console.log("Normalized role:", normalizedRole);
+
+            // 6. Validate role
+            if (
+                normalizedRole !== "ADMIN" &&
+                normalizedRole !== "STUDENT"
+            ) {
+                console.error(
+                    "Unknown role object:",
+                    user.role
+                );
+
+                throw new Error(
+                    `Invalid user role: ${JSON.stringify(user.role)}`
+                );
+            }
+
+            // 7. Save user information
+            localStorage.setItem(
+                "name",
+                user.name || "User"
+            );
+
+            localStorage.setItem(
+                "role",
+                normalizedRole
+            );
+
+            localStorage.setItem(
+                "studentId",
+                String(user.id)
+            );
+
+            // 8. Redirect according to role
+            if (normalizedRole === "ADMIN") {
                 navigate("/admin");
             } else {
                 navigate("/student");
             }
 
         } catch (error) {
-            console.error(error);
-            setError("Invalid email or password.");
+            console.error("Login error:", error);
+
+            // Remove partially stored login information
+            localStorage.removeItem("token");
+            localStorage.removeItem("name");
+            localStorage.removeItem("role");
+            localStorage.removeItem("studentId");
+
+            if (error.response?.status === 401) {
+                setError("Invalid email or password.");
+            } else if (error.response?.status === 403) {
+                setError(
+                    "You do not have permission to access this account."
+                );
+            } else if (error.response?.status === 404) {
+                setError(
+                    "Login service was not found. Please check the backend server."
+                );
+            } else {
+                setError(
+                    error.message ||
+                    "Unable to login. Please try again."
+                );
+            }
         } finally {
             setLoading(false);
         }
@@ -64,7 +173,10 @@ function Login() {
                 </div>
 
                 {error && (
-                    <div className="alert alert-danger">
+                    <div
+                        className="alert alert-danger"
+                        role="alert"
+                    >
                         {error}
                     </div>
                 )}
@@ -81,7 +193,10 @@ function Login() {
                             className="form-control"
                             placeholder="Enter your email"
                             value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            onChange={(e) =>
+                                setEmail(e.target.value)
+                            }
+                            autoComplete="email"
                             required
                         />
                     </div>
@@ -96,7 +211,10 @@ function Login() {
                             className="form-control"
                             placeholder="Enter your password"
                             value={password}
-                            onChange={(e) => setPassword(e.target.value)}
+                            onChange={(e) =>
+                                setPassword(e.target.value)
+                            }
+                            autoComplete="current-password"
                             required
                         />
                     </div>
@@ -106,7 +224,9 @@ function Login() {
                         className="btn-primary-custom w-100"
                         disabled={loading}
                     >
-                        {loading ? "Signing in..." : "Sign In"}
+                        {loading
+                            ? "Signing in..."
+                            : "Sign In"}
                     </button>
 
                 </form>
