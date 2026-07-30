@@ -22,6 +22,10 @@ function Login() {
                 email,
                 password
             });
+            console.log(
+    "Login Response:",
+    JSON.stringify(loginResponse.data, null, 2)
+);
 
             const token = loginResponse.data;
 
