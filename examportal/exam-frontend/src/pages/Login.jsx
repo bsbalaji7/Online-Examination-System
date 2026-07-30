@@ -27,7 +27,12 @@ function Login() {
     JSON.stringify(loginResponse.data, null, 2)
 );
 
-            const token = loginResponse.data;
+            const token = loginResponse.data.token;
+
+                localStorage.setItem("token", token);
+                localStorage.setItem("name", loginResponse.data.name);
+                localStorage.setItem("role", loginResponse.data.role);
+                localStorage.setItem("studentId", loginResponse.data.userId);
 
             if (!token) {
                 throw new Error("Token was not received from server");
