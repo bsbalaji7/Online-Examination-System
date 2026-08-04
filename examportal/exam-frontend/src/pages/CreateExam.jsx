@@ -13,9 +13,11 @@ function CreateExam() {
         totalMarks: ""
     });
 
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] =
+        useState(false);
 
     const handleChange = (e) => {
+
         setExam({
             ...exam,
             [e.target.name]: e.target.value
@@ -26,23 +28,26 @@ function CreateExam() {
 
         e.preventDefault();
 
-        const token = localStorage.getItem("token");
-
         try {
 
             setLoading(true);
 
+            const token =
+                localStorage.getItem("token");
+
             await api.post(
                 "/exams",
                 {
-                    title: exam.title,
-                    description: exam.description,
-                    duration: Number(exam.duration),
-                    totalMarks: Number(exam.totalMarks)
+                    ...exam,
+                    duration:
+                        Number(exam.duration),
+                    totalMarks:
+                        Number(exam.totalMarks)
                 },
                 {
                     headers: {
-                        Authorization: `Bearer ${token}`
+                        Authorization:
+                            `Bearer ${token}`
                     }
                 }
             );
@@ -53,126 +58,173 @@ function CreateExam() {
 
         } catch (error) {
 
-            console.error(
-                "Create exam error:",
-                error.response?.data || error
-            );
+            console.error(error);
 
             alert(
                 error.response?.data?.message ||
-                "Failed to create exam"
+                "Unable to create exam."
             );
 
         } finally {
+
             setLoading(false);
         }
     };
 
     return (
-        <div className="container mt-5">
+        <div className="app-page">
 
-            <div className="row justify-content-center">
+            <div
+                className="container"
+                style={{ maxWidth: "800px" }}
+            >
 
-                <div className="col-md-7">
+                <div className="mb-5">
 
-                    <div className="card shadow">
+                    <p className="text-secondary mb-2">
+                        ADMINISTRATION
+                    </p>
 
-                        <div className="card-body p-4">
+                    <h1 className="page-title">
+                        Create Examination
+                    </h1>
 
-                            <h2 className="mb-4">
-                                Create Exam
-                            </h2>
+                    <p className="page-subtitle">
+                        Configure a new examination for students.
+                    </p>
 
-                            <form onSubmit={handleSubmit}>
+                </div>
 
-                                <div className="mb-3">
-                                    <label className="form-label">
-                                        Exam Title
-                                    </label>
+                <div className="app-card p-4 p-md-5">
 
-                                    <input
-                                        type="text"
-                                        name="title"
-                                        className="form-control"
-                                        value={exam.title}
-                                        onChange={handleChange}
-                                        required
-                                    />
-                                </div>
+                    <form onSubmit={handleSubmit}>
 
-                                <div className="mb-3">
-                                    <label className="form-label">
-                                        Description
-                                    </label>
+                        <div className="mb-4">
 
-                                    <textarea
-                                        name="description"
-                                        className="form-control"
-                                        value={exam.description}
-                                        onChange={handleChange}
-                                        required
-                                    />
-                                </div>
+                            <label className="form-label">
+                                Exam Title
+                            </label>
 
-                                <div className="mb-3">
-                                    <label className="form-label">
-                                        Duration (Minutes)
-                                    </label>
+                            <input
+                                type="text"
+                                name="title"
+                                className="form-control"
+                                placeholder="Example: Java Fundamentals"
+                                value={exam.title}
+                                onChange={handleChange}
+                                required
+                            />
+
+                        </div>
+
+                        <div className="mb-4">
+
+                            <label className="form-label">
+                                Description
+                            </label>
+
+                            <textarea
+                                name="description"
+                                className="form-control"
+                                rows="4"
+                                placeholder="Briefly describe this examination..."
+                                value={exam.description}
+                                onChange={handleChange}
+                                required
+                            />
+
+                        </div>
+
+                        <div className="row">
+
+                            <div className="col-md-6 mb-4">
+
+                                <label className="form-label">
+                                    Duration
+                                </label>
+
+                                <div className="input-group">
 
                                     <input
                                         type="number"
                                         name="duration"
                                         className="form-control"
+                                        placeholder="60"
                                         min="1"
-                                        value={exam.duration}
-                                        onChange={handleChange}
+                                        value={
+                                            exam.duration
+                                        }
+                                        onChange={
+                                            handleChange
+                                        }
                                         required
                                     />
-                                </div>
 
-                                <div className="mb-3">
-                                    <label className="form-label">
-                                        Total Marks
-                                    </label>
-
-                                    <input
-                                        type="number"
-                                        name="totalMarks"
-                                        className="form-control"
-                                        min="1"
-                                        value={exam.totalMarks}
-                                        onChange={handleChange}
-                                        required
-                                    />
-                                </div>
-
-                                <div className="d-flex gap-2">
-
-                                    <button
-                                        type="submit"
-                                        className="btn btn-primary"
-                                        disabled={loading}
-                                    >
-                                        {loading
-                                            ? "Creating..."
-                                            : "Create Exam"}
-                                    </button>
-
-                                    <button
-                                        type="button"
-                                        className="btn btn-secondary"
-                                        onClick={() => navigate("/admin")}
-                                    >
-                                        Cancel
-                                    </button>
+                                    <span className="input-group-text">
+                                        Minutes
+                                    </span>
 
                                 </div>
 
-                            </form>
+                            </div>
+
+                            <div className="col-md-6 mb-4">
+
+                                <label className="form-label">
+                                    Total Marks
+                                </label>
+
+                                <input
+                                    type="number"
+                                    name="totalMarks"
+                                    className="form-control"
+                                    placeholder="100"
+                                    min="1"
+                                    value={
+                                        exam.totalMarks
+                                    }
+                                    onChange={
+                                        handleChange
+                                    }
+                                    required
+                                />
+
+                            </div>
 
                         </div>
 
-                    </div>
+                        <hr
+                            style={{
+                                borderColor:
+                                    "rgba(148,163,184,.15)"
+                            }}
+                        />
+
+                        <div className="d-flex justify-content-end gap-3 mt-4">
+
+                            <button
+                                type="button"
+                                className="btn-outline-custom"
+                                onClick={() =>
+                                    navigate("/admin")
+                                }
+                            >
+                                Cancel
+                            </button>
+
+                            <button
+                                type="submit"
+                                className="btn-primary-custom"
+                                disabled={loading}
+                            >
+                                {loading
+                                    ? "Creating..."
+                                    : "Create Examination"}
+                            </button>
+
+                        </div>
+
+                    </form>
 
                 </div>
 
