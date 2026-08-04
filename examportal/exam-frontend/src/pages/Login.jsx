@@ -3,161 +3,67 @@ import { Link, useNavigate } from "react-router-dom";
 import api from "../services/api";
 
 function Login() {
+
     const navigate = useNavigate();
 
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
+    const [formData, setFormData] = useState({
+        email: "",
+        password: ""
+    });
 
-    const handleLogin = async (e) => {
+    const [loading, setLoading] = useState(false);
+
+    const handleChange = (e) => {
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value
+        });
+    };
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
-        setLoading(true);
-        setError("");
-
         try {
-            // 1. Login and receive JWT token
-            const loginResponse = await api.post("/auth/login", {
-                email,
-                password
-            });
-            console.log(
-    "Login Response:",
-    JSON.stringify(loginResponse.data, null, 2)
-);
 
-            const token = loginResponse.data.token;
+            setLoading(true);
 
-                localStorage.setItem("token", token);
-                localStorage.setItem("name", loginResponse.data.name);
-                localStorage.setItem("role", loginResponse.data.role);
-                localStorage.setItem("studentId", loginResponse.data.userId);
-
-            if (!token) {
-                throw new Error("Token was not received from server");
-            }
-
-            // 2. Temporarily save token
-            localStorage.setItem("token", token);
-
-            // 3. Get users to identify the logged-in user
-            const usersResponse = await api.get("/auth/users", {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
-
-            // 4. Find user using login email
-            const user = usersResponse.data.find(
-                (u) =>
-                    u.email &&
-                    u.email.toLowerCase() === email.toLowerCase()
+            const response = await api.post(
+                "/auth/login",
+                formData
             );
 
-            if (!user) {
-                throw new Error("Logged-in user information not found");
-            }
+            console.log("Login Response:", response.data);
 
-            console.log("Logged in user:", user);
-            console.log("Role from backend:", user.role);
+            // Clear previous data
+            localStorage.clear();
 
-            // 5. Extract role
-            // Supports:
-            // "STUDENT"
-            // "ROLE_STUDENT"
-            // { name: "STUDENT" }
-            // { roleName: "STUDENT" }
-            // { role: "STUDENT" }
-            // { authority: "ROLE_STUDENT" }
+            // Save JWT
+            localStorage.setItem("token", response.data.token);
 
-            let roleValue = "";
+            // Save user details
+            localStorage.setItem("name", response.data.name);
+            localStorage.setItem("email", response.data.email);
+            localStorage.setItem("role", response.data.role);
+            localStorage.setItem("studentId", response.data.userId);
 
-            if (typeof user.role === "string") {
-                roleValue = user.role;
-            } else if (
-                user.role &&
-                typeof user.role === "object"
-            ) {
-                roleValue =
-                    user.role.name ||
-                    user.role.roleName ||
-                    user.role.role ||
-                    user.role.authority ||
-                    "";
-            }
+            console.log("Stored Token:", localStorage.getItem("token"));
 
-            const normalizedRole = String(roleValue)
-                .toUpperCase()
-                .replace("ROLE_", "")
-                .trim();
-
-            console.log("Role value:", roleValue);
-            console.log("Normalized role:", normalizedRole);
-
-            // 6. Validate role
-            if (
-                normalizedRole !== "ADMIN" &&
-                normalizedRole !== "STUDENT"
-            ) {
-                console.error(
-                    "Unknown role object:",
-                    user.role
-                );
-
-                throw new Error(
-                    `Invalid user role: ${JSON.stringify(user.role)}`
-                );
-            }
-
-            // 7. Save user information
-            localStorage.setItem(
-                "name",
-                user.name || "User"
-            );
-
-            localStorage.setItem(
-                "role",
-                normalizedRole
-            );
-
-            localStorage.setItem(
-                "studentId",
-                String(user.id)
-            );
-
-            // 8. Redirect according to role
-            if (normalizedRole === "ADMIN") {
+            if (response.data.role === "ADMIN") {
                 navigate("/admin");
             } else {
                 navigate("/student");
             }
 
         } catch (error) {
-            console.error("Login error:", error);
 
-            // Remove partially stored login information
-            localStorage.removeItem("token");
-            localStorage.removeItem("name");
-            localStorage.removeItem("role");
-            localStorage.removeItem("studentId");
+            console.error(error);
 
-            if (error.response?.status === 401) {
-                setError("Invalid email or password.");
-            } else if (error.response?.status === 403) {
-                setError(
-                    "You do not have permission to access this account."
-                );
-            } else if (error.response?.status === 404) {
-                setError(
-                    "Login service was not found. Please check the backend server."
-                );
+            if (error.response) {
+                alert(error.response.data.message || "Invalid Credentials");
             } else {
-                setError(
-                    error.message ||
-                    "Unable to login. Please try again."
-                );
+                alert("Unable to connect to server.");
             }
+
         } finally {
             setLoading(false);
         }
