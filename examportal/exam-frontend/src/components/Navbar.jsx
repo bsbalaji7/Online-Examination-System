@@ -1,13 +1,12 @@
 import { useNavigate } from "react-router-dom";
 
 function Navbar() {
-
     const navigate = useNavigate();
 
     const name = localStorage.getItem("name");
     const role = localStorage.getItem("role");
 
-    const goHome = () => {
+    const goDashboard = () => {
         navigate(role === "ADMIN" ? "/admin" : "/student");
     };
 
@@ -17,30 +16,41 @@ function Navbar() {
     };
 
     return (
-        <nav className="app-navbar">
-            <div className="container h-100 d-flex align-items-center justify-content-between">
+        <nav className="navbar navbar-expand-lg bg-white shadow-sm sticky-top">
+            <div className="container">
 
                 <div
-                    className="brand"
-                    onClick={goHome}
+                    className="navbar-brand fw-bold fs-3"
+                    style={{ cursor: "pointer", color: "#2563eb" }}
+                    onClick={goDashboard}
                 >
-                    Exam<span>Portal</span>
+                    🎓 ExamPortal
                 </div>
 
                 <div className="d-flex align-items-center gap-3">
 
+                    <button
+                        className="btn btn-outline-primary"
+                        onClick={goDashboard}
+                    >
+                        Dashboard
+                    </button>
+
                     <div className="text-end">
-                        <div className="user-name">
-                            {name}
+                        <div
+                            className="fw-bold"
+                            style={{ fontSize: "15px" }}
+                        >
+                            👋 {name}
                         </div>
 
-                        <span className="role-badge">
+                        <small className="badge bg-primary">
                             {role}
-                        </span>
+                        </small>
                     </div>
 
                     <button
-                        className="btn-outline-custom"
+                        className="btn btn-danger"
                         onClick={logout}
                     >
                         Logout
