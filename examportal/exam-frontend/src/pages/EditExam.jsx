@@ -3,7 +3,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import api from "../services/api";
 
 function EditExam() {
-
     const { id } = useParams();
     const navigate = useNavigate();
 
@@ -31,9 +30,8 @@ function EditExam() {
             });
 
             setExam(response.data);
-
         } catch (error) {
-            console.error("Load exam error:", error);
+            console.error(error);
             alert("Failed to load exam");
         }
     };
@@ -69,117 +67,143 @@ function EditExam() {
             );
 
             alert("Exam updated successfully!");
-
             navigate("/admin/exams");
-
         } catch (error) {
-            console.error(
-                "Update exam error:",
-                error.response?.data || error
-            );
-
+            console.error(error);
             alert("Failed to update exam");
-
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="container mt-5">
+        <div className="container py-5">
 
             <div className="row justify-content-center">
 
-                <div className="col-md-7">
+                <div className="col-lg-8">
 
-                    <div className="card shadow">
+                    <div className="card shadow border-0">
+
+                        <div className="card-header bg-primary text-white p-4">
+
+                            <h2 className="mb-1">
+                                ✏️ Edit Examination
+                            </h2>
+
+                            <small>
+                                Update the examination details.
+                            </small>
+
+                        </div>
 
                         <div className="card-body p-4">
 
-                            <h2 className="mb-4">Edit Exam</h2>
-
                             <form onSubmit={handleSubmit}>
 
-                                <div className="mb-3">
-                                    <label className="form-label">
+                                <div className="mb-4">
+
+                                    <label className="form-label fw-bold">
                                         Exam Title
                                     </label>
 
                                     <input
-                                        type="text"
+                                        className="form-control form-control-lg"
                                         name="title"
-                                        className="form-control"
                                         value={exam.title}
                                         onChange={handleChange}
                                         required
                                     />
+
                                 </div>
 
-                                <div className="mb-3">
-                                    <label className="form-label">
+                                <div className="mb-4">
+
+                                    <label className="form-label fw-bold">
                                         Description
                                     </label>
 
                                     <textarea
-                                        name="description"
+                                        rows="4"
                                         className="form-control"
+                                        name="description"
                                         value={exam.description}
                                         onChange={handleChange}
                                         required
                                     />
+
                                 </div>
 
-                                <div className="mb-3">
-                                    <label className="form-label">
-                                        Duration (Minutes)
-                                    </label>
+                                <div className="row">
 
-                                    <input
-                                        type="number"
-                                        name="duration"
-                                        className="form-control"
-                                        min="1"
-                                        value={exam.duration}
-                                        onChange={handleChange}
-                                        required
-                                    />
+                                    <div className="col-md-6">
+
+                                        <div className="mb-4">
+
+                                            <label className="form-label fw-bold">
+                                                Duration (Minutes)
+                                            </label>
+
+                                            <input
+                                                type="number"
+                                                min="1"
+                                                className="form-control"
+                                                name="duration"
+                                                value={exam.duration}
+                                                onChange={handleChange}
+                                                required
+                                            />
+
+                                        </div>
+
+                                    </div>
+
+                                    <div className="col-md-6">
+
+                                        <div className="mb-4">
+
+                                            <label className="form-label fw-bold">
+                                                Total Marks
+                                            </label>
+
+                                            <input
+                                                type="number"
+                                                min="1"
+                                                className="form-control"
+                                                name="totalMarks"
+                                                value={exam.totalMarks}
+                                                onChange={handleChange}
+                                                required
+                                            />
+
+                                        </div>
+
+                                    </div>
+
                                 </div>
 
-                                <div className="mb-3">
-                                    <label className="form-label">
-                                        Total Marks
-                                    </label>
+                                <div className="d-flex gap-3">
 
-                                    <input
-                                        type="number"
-                                        name="totalMarks"
-                                        className="form-control"
-                                        min="1"
-                                        value={exam.totalMarks}
-                                        onChange={handleChange}
-                                        required
-                                    />
+                                    <button
+                                        className="btn btn-success px-4"
+                                        disabled={loading}
+                                    >
+                                        {loading
+                                            ? "Updating..."
+                                            : "Save Changes"}
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        className="btn btn-outline-secondary px-4"
+                                        onClick={() =>
+                                            navigate("/admin/exams")
+                                        }
+                                    >
+                                        Cancel
+                                    </button>
+
                                 </div>
-
-                                <button
-                                    type="submit"
-                                    className="btn btn-success me-2"
-                                    disabled={loading}
-                                >
-                                    {loading
-                                        ? "Updating..."
-                                        : "Update Exam"}
-                                </button>
-
-                                <button
-                                    type="button"
-                                    className="btn btn-secondary"
-                                    onClick={() =>
-                                        navigate("/admin/exams")
-                                    }
-                                >
-                                    Cancel
-                                </button>
 
                             </form>
 
